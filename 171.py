@@ -11,8 +11,11 @@ from sklearn.metrics import accuracy_score, f1_score
 # Define transformations, load dataset, and split into train and test
 def setup_data():
     transform = transforms.Compose([...])
-    dataset = ImageFolder(root='path_to_dataset', transform=transform)
-    trainset, testset = torch.utils.data.random_split(dataset, [...])
+    trainpath = r'CS171Project\\train'
+    testpath = r'CS171Project\\test'
+    trainset = ImageFolder(root=trainpath, transform=transform)
+    testset = ImageFolder(root=testpath, transform=transform)
+    # trainset, testset = torch.utils.data.random_split(dataset, [...])
     trainloader = DataLoader(trainset, batch_size=32, shuffle=True)
     testloader = DataLoader(testset, batch_size=32, shuffle=False)
     return trainloader, testloader
