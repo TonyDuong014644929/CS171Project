@@ -7,10 +7,16 @@ from torchvision.models import mobilenet_v2
 import torch.nn as nn
 import torch.optim as optim
 from sklearn.metrics import accuracy_score, f1_score
+import numpy as np
+import matplotlib.pyplot as plt
+import time
 
 # Define transformations, load dataset, and split into train and test
 def setup_data():
-    transform = transforms.Compose([...])
+    transform = transforms.Compose([
+        transforms.ToTensor(), 
+        transforms.RandomResizedCrop(224)
+    ])
     trainpath = r'CS171Project\\train'
     testpath = r'CS171Project\\test'
     trainset = ImageFolder(root=trainpath, transform=transform)
@@ -29,17 +35,27 @@ def setup_model():
 # Training function
 def train_model(model, trainloader, criterion, optimizer, epochs=10):
     model.train()
+    since = time.time()
     for epoch in range(epochs):
-        ...
+        for inputs,labels in trainloader:
+            outputs = model(inputs)
+            loss = criterion(outputs,labels)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            
     print('Finished Training')
+    time_elasped = time.time() - since
+    print(time_elasped)
 
 # Evaluation function
 def evaluate_model(model, testloader):
     model.eval()
     ...
-    print(f'Accuracy: {acc}, F1-Score: {f1}')
-
+    # print(f'Accuracy: {acc}, F1-Score: {f1}')
 def main():
+
     trainloader, testloader = setup_data()
     model = setup_model()
     criterion = nn.CrossEntropyLoss()
