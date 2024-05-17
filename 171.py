@@ -10,6 +10,7 @@ from sklearn.metrics import accuracy_score, f1_score
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+from pathlib import Path
 
 def setup_data():
     transform = transforms.Compose([
@@ -18,8 +19,9 @@ def setup_data():
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
-    trainpath = r'CS171Project\\train'
-    testpath = r'CS171Project\\test'
+    path = Path('.')
+    trainpath = path / 'train'
+    testpath = path / 'test'
     dataset = ImageFolder(root=trainpath, transform=transform)
     testset = ImageFolder(root=testpath, transform=transform)
     
@@ -53,6 +55,7 @@ def train_model(model, trainloader, valloader, criterion, optimizer, epochs=10, 
         model.train()
         running_loss = 0.0
         for inputs, labels in trainloader:
+            print(inputs)
             inputs, labels = inputs.to(device), labels.to(device)
             optimizer.zero_grad()
             outputs = model(inputs)
