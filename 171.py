@@ -60,7 +60,7 @@ def setup_model(num_classes=2):
     model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes)
     return model
 
-def train_model(model, trainloader, valloader, criterion, optimizer, epochs=10, device='cpu'):
+def train_model(model, trainloader, valloader, criterion, optimizer, epochs=4, device='cpu'):
     model.to(device)
     best_acc = 0.0
     for epoch in range(epochs):
@@ -114,9 +114,9 @@ def evaluate_model(model, dataloader, device='cpu'):
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-            print(labels)
             print('total:', total)
             print('correct:', correct)
+                
     acc = 100 * correct / total
     return acc
 
