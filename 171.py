@@ -12,6 +12,18 @@ import matplotlib.pyplot as plt
 import time
 from pathlib import Path
 
+fruits = {0,    #apple
+          1,    #banana
+          14,   #grapes
+          16,   #kiwi
+          19,   #mango
+          21,   #orange
+          23,   #pear
+          25,   #pineapple
+          26,   #pomegranate
+          35    #watermelon
+          }
+
 def setup_data():
     transform = transforms.Compose([
         transforms.Resize(256),
@@ -36,7 +48,7 @@ def setup_data():
     trainset = torch.utils.data.Subset(dataset, train_idx)
     valset = torch.utils.data.Subset(dataset, val_idx)
 
-    trainloader = DataLoader(trainset, batch_size=32, shuffle=True)
+    trainloader = DataLoader(trainset, batch_size=32, shuffle=True, num_workers=3)
     valloader = DataLoader(valset, batch_size=32, shuffle=False)
     testloader = DataLoader(testset, batch_size=32, shuffle=False)
     
@@ -54,12 +66,25 @@ def train_model(model, trainloader, valloader, criterion, optimizer, epochs=10, 
     for epoch in range(epochs):
         model.train()
         running_loss = 0.0
-        for inputs, labels in trainloader:
-            print(inputs)
+        for i,(inputs, labels) in enumerate(trainloader):
+            print('Epoch:' , epoch + 1, end='')
+            print(' | Batch index:', i, end='')
+            print(' | Batch size:', labels.size()[0])
+            # plt.imshow(inputs[0][0], cmap="gray")
+            # plt.show()
             inputs, labels = inputs.to(device), labels.to(device)
-            optimizer.zero_grad()
+            for i in range(labels.size()[0]):
+                if labels[i].item() in fruits:
+                    labels[i] = 0
+                else:
+                    labels[i] = 1
+            
+            # forward pass
             outputs = model(inputs)
             loss = criterion(outputs, labels)
+
+            # optimize and backward
+            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             running_loss += loss.item() * inputs.size(0)
@@ -80,10 +105,18 @@ def evaluate_model(model, dataloader, device='cpu'):
     with torch.no_grad():
         for inputs, labels in dataloader:
             inputs, labels = inputs.to(device), labels.to(device)
+            for i in range(labels.size()[0]):
+                if labels[i].item() in fruits:
+                    labels[i] = 0
+                else:
+                    labels[i] = 1
             outputs = model(inputs)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
+            print(labels)
+            print('total:', total)
+            print('correct:', correct)
     acc = 100 * correct / total
     return acc
 
